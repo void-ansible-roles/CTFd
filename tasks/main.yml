@@ -1,0 +1,79 @@
+---
+- name: Install dependencies
+  xbps: name={{ item }} state=present
+  with_items:
+    - base-devel
+    - git
+    - libffi-devel
+    - python-devel
+    - python-pip
+    - uwsgi
+    - uwsgi-python
+    
+- name: Install firewall rules
+  copy: src=ctfd.rules dest=/etc/iptables.d/ctfd.rules owner=root group=root mode=0640
+  notify:
+    - iptables
+
+- name: Make ctfd group
+  group: name=ctfd state=present
+    
+- name: Make ctfd user
+  user: name=ctfd group=ctfd state=present
+
+- name: Add nginx user to ctfd group
+  user: name=nginx groups=ctfd append=yes
+  
+- name: Make CTFd deploy directory
+  file: path={{ ctfd_deploy_directory }} state=directory owner=ctfd group=ctfd mode=0755
+
+- name: Make CTFd serve directory
+  file: path={{ ctfd_serve_directory }} state=directory owner=ctfd group=ctfd mode=0755
+  
+- name: Install CTFd
+  git: repo=https://github.com/isislab/CTFd.git dest={{ ctfd_deploy_directory }} force=yes
+  become_user: ctfd
+  
+- name: Install CTFd pip dependencies
+  pip: requirements={{ctfd_deploy_directory}}/requirements.txt umask=0022
+  
+- name: Configure CTFd
+  template: src=config.py dest={{ ctfd_deploy_directory }}/CTFd/config.py owner=ctfd group=ctfd mode=0644
+
+- name: Configure CTFd uwsgi  
+  template: src=ctfd.ini dest={{ ctfd_deploy_directory }}/ctfd.ini owner=ctfd group=ctfd mode=0644
+  
+- name: Add CTFd Postgres Database
+  postgresql_db: name={{ ctfd_db }}
+  become_user: postgres
+  
+- name: Add CTFd Postgres User
+  postgresql_user: db={{ ctfd_db }} name={{ ctfd_dbuser }} password={{ ctfd_dbpass }} priv=ALL
+  become_user: postgres
+
+- name: Create ctfd service folder
+  file: path=/etc/sv/ctfd owner=root group=root mode=0755 state=directory
+
+- name: Create ctfd supervise folder
+  file: path=/run/runit/supervise.ctfd owner=root group=root mode=0700 state=directory
+  
+- name: Install ctfd run file
+  template: src=ctfd.runit dest=/etc/sv/ctfd/run owner=root group=root mode=0755
+
+- name: Configure ctfd runit supervision
+  file: src=/run/runit/supervise.ctfd dest=/etc/sv/ctfd/supervise owner=root group=root state=link
+  
+- name: Enable ctfd on startup
+  file: src=/etc/sv/ctfd dest=/var/service/ctfd owner=root group=root state=link
+  notify:
+    - nginx
+  
+- name: Install site descriptor
+  template: src=ctfd.conf dest=/etc/nginx/sites-available/ctfd.conf owner=root group=root mode=0644
+  notify:
+    - nginx
+
+- name: Enable site
+  file: src=/etc/nginx/sites-available/ctfd.conf dest=/etc/nginx/sites-enabled/ctfd.conf state=link
+  notify:
+    - nginx

@@ -1,0 +1,13 @@
+---
+# CTFd PostgreSQL Database Information
+ctfd_db: ctfdb
+ctfd_dbuser: ctfdbuser
+
+# CTFd Config Information
+ctfd_site_url: .ctfd.io
+ctfd_email: noreply@ctfd.io
+
+# CTFd setup information
+ctfd_deploy_directory: /opt/ctfd
+ctfd_serve_directory: /srv/ctfd 
+
