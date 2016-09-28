@@ -53,18 +53,12 @@
 
 - name: Create ctfd service folder
   file: path=/etc/sv/ctfd owner=root group=root mode=0755 state=directory
-
-- name: Create ctfd supervise folder
-  file: path=/run/runit/supervise.ctfd owner=root group=root mode=0700 state=directory
-  
+ 
 - name: Install ctfd run file
   template: src=ctfd.runit dest=/etc/sv/ctfd/run owner=root group=root mode=0755
 
-- name: Configure ctfd runit supervision
-  file: src=/run/runit/supervise.ctfd dest=/etc/sv/ctfd/supervise owner=root group=root state=link
-  
 - name: Enable ctfd on startup
-  file: src=/etc/sv/ctfd dest=/var/service/ctfd owner=root group=root state=link
+  file: src=/etc/sv/ctfd dest=/var/service/ctfd state=link
   notify:
     - nginx
   
