@@ -10,6 +10,7 @@ with open('.ctfd_secret_key', 'a+') as secret:
         secret.flush()
 
 ##### SERVER SETTINGS #####
+APPLICATION_ROOT = '{{ ctfd_site_mount }}'
 SECRET_KEY = key
 SQLALCHEMY_DATABASE_URI = 'postgresql://{{ ctfd_dbuser }}:{{ ctfd_dbpass }}@localhost/{{ ctfd_db }}'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -23,13 +24,6 @@ UPLOAD_FOLDER = os.path.normpath('static/uploads')
 TEMPLATES_AUTO_RELOAD = True
 TRUSTED_PROXIES = [
     '^127\.0\.0\.1$',
-    ## Remove the following proxies if you do not trust the local network
-    ## For example if you are running a CTF on your laptop and the teams are all on the same network
-    '^::1$',
-    '^fc00:',
-    '^10\.',
-    '^172\.(1[6-9]|2[0-9]|3[0-1])\.',
-    '^192\.168\.'
 ]
 
 CACHE_TYPE = "simple"

@@ -5,6 +5,7 @@ ctfd_dbuser: ctfdbuser
 
 # CTFd Config Information
 ctfd_site_url: .ctfd.io
+ctfd_site_mount: /
 ctfd_email: noreply@ctfd.io
 
 # CTFd setup information
