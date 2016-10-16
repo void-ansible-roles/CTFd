@@ -1,7 +1,10 @@
 CTFd
 ====
 
-Installs CTFd on Void Linux and serves it using nginx and uWSGI.
+Installs CTFd on Void Linux and serves it using nginx and uWSGI. Also creates 
+the /etc/nginx/site-available/ctfd/ directory where locations not managed by 
+CTFd can be put. WARNING: These locations may conflict with locations CTFd 
+manages. It is up to the administrator to ensure this does not happen.
 
 Requirements
 ------------
