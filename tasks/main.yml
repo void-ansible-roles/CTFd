@@ -39,9 +39,13 @@
   
 - name: Configure CTFd
   template: src=config.py dest={{ ctfd_deploy_directory }}/CTFd/config.py owner=ctfd group=ctfd mode=0644
-
+  notify:
+    - ctfd
+  
 - name: Configure CTFd uwsgi  
   template: src=ctfd.ini dest={{ ctfd_deploy_directory }}/ctfd.ini owner=ctfd group=ctfd mode=0644
+  notify:
+    - ctfd
   
 - name: Add CTFd Postgres Database
   postgresql_db: name={{ ctfd_db }}
@@ -56,7 +60,7 @@
  
 - name: Install ctfd run file
   template: src=ctfd.runit dest=/etc/sv/ctfd/run owner=root group=root mode=0755
-
+    
 - name: Enable ctfd on startup
   file: src=/etc/sv/ctfd dest=/var/service/ctfd state=link
   notify:

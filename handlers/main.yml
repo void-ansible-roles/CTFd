@@ -1,0 +1,3 @@
+---
+- name: ctfd
+  command: sv restart ctfd
