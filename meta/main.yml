@@ -1,4 +1,4 @@
 ---
 dependencies:
-  - { role: postgresql }
+  - { role: PostgreSQL }
   - { role: nginx }
