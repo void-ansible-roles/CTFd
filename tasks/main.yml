@@ -1,82 +1,152 @@
 ---
 - name: Install dependencies
-  xbps: name={{ item }} state=present
-  with_items:
-    - base-devel
-    - git
-    - libffi-devel
-    - python-devel
-    - python-pip
-    - uwsgi
-    - uwsgi-python
+  xbps:
+    pkg:
+      - base-devel
+      - git
+      - libffi-devel
+      - python-devel
+      - python-pip
+      - uwsgi
+      - uwsgi-python
+    state: present
 
 - name: Install firewall rules
-  copy: src=ctfd.rules dest=/etc/iptables.d/ctfd.rules owner=root group=root mode=0640
+  copy:
+    src: ctfd.rules
+    dest: /etc/iptables.d/ctfd.rules
+    owner: root
+    group: root
+    mode: 0640
   notify:
     - iptables
 
 - name: Make ctfd group
-  group: name=ctfd state=present
+  group:
+    name: ctfd
+    state: present
 
 - name: Make ctfd user
-  user: name=ctfd group=ctfd state=present
+  user:
+    name: ctfd
+    group: ctfd
+    state: present
 
 - name: Add nginx user to ctfd group
-  user: name=nginx groups=ctfd append=yes
+  user:
+    name: nginx
+    groups: ctfd
+    append: yes
 
 - name: Make CTFd deploy directory
-  file: path={{ ctfd_deploy_directory }} state=directory owner=ctfd group=ctfd mode=0755
+  file:
+    path: {{ ctfd_deploy_directory }}
+    state: directory
+    owner: ctfd
+    group: ctfd
+    mode: 0755
 
 - name: Make CTFd serve directory
-  file: path={{ ctfd_serve_directory }} state=directory owner=ctfd group=ctfd mode=0755
+  file:
+    path: {{ ctfd_serve_directory }}
+    state: directory
+    owner: ctfd
+    group: ctfd
+    mode: 0755
 
 - name: Install CTFd
-  git: repo=https://github.com/isislab/CTFd.git dest={{ ctfd_deploy_directory }} force=yes
+  git:
+    repo: https://github.com/isislab/CTFd.git
+    dest: {{ ctfd_deploy_directory }}
+    force: yes
   become_user: ctfd
 
 - name: Install CTFd pip dependencies
-  pip: requirements={{ctfd_deploy_directory}}/requirements.txt umask=0022
+  pip:
+    requirements: {{ctfd_deploy_directory}}/requirements.txt
+    umask: 0022
 
 - name: Configure CTFd
-  template: src=config.py dest={{ ctfd_deploy_directory }}/CTFd/config.py owner=ctfd group=ctfd mode=0644
+  template:
+    src: config.py
+    dest: {{ ctfd_deploy_directory }}/CTFd/config.py
+    owner: ctfd
+    group: ctfd
+    mode: 0644
   notify:
     - ctfd
 
 - name: Configure CTFd uwsgi  
-  template: src=ctfd.ini dest={{ ctfd_deploy_directory }}/ctfd.ini owner=ctfd group=ctfd mode=0644
+  template:
+    src: ctfd.ini
+    dest: {{ ctfd_deploy_directory }}/ctfd.ini
+    owner: ctfd
+    group: ctfd
+    mode: 0644
   notify:
     - ctfd
 
 - name: Add CTFd Postgres Database
-  postgresql_db: name={{ ctfd_db }}
+  postgresql_db:
+    name: {{ ctfd_db }}
   become_user: postgres
 
 - name: Add CTFd Postgres User
-  postgresql_user: db={{ ctfd_db }} name={{ ctfd_dbuser }} password={{ ctfd_dbpass }} priv=ALL
+  postgresql_user:
+    db: {{ ctfd_db }}
+    name: {{ ctfd_dbuser }}
+    password: {{ ctfd_dbpass }}
+    priv: ALL
   become_user: postgres
 
 - name: Create ctfd service folder
-  file: path=/etc/sv/ctfd owner=root group=root mode=0755 state=directory
+  file:
+    path: /etc/sv/ctfd
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
 
 - name: Install ctfd run file
-  template: src=ctfd.runit dest=/etc/sv/ctfd/run owner=root group=root mode=0755
+  template:
+    src: ctfd.runit
+    dest: /etc/sv/ctfd/run
+    owner: root
+    group: root
+    mode: 0755
 
 - name: Enable ctfd on startup
-  file: src=/etc/sv/ctfd dest=/var/service/ctfd state=link
+  file:
+    src: /etc/sv/ctfd
+    dest: /var/service/ctfd
+    state: link
   notify:
     - nginx
 
 - name: Create folder for external nginx locations
-  file: path=/etc/nginx/locations.d/ctfd state=directory owner=root group=root mode=0755
+  file:
+    path: /etc/nginx/locations.d/ctfd
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
   notify:
     - nginx
 
 - name: Install site descriptor
-  template: src=ctfd.conf dest=/etc/nginx/sites-available/ctfd.conf owner=root group=root mode=0644
+  template:
+    src: ctfd.conf
+    dest: /etc/nginx/sites-available/ctfd.conf
+    owner: root
+    group: root
+    mode: 0644
   notify:
     - nginx
 
 - name: Enable site
-  file: src=/etc/nginx/sites-available/ctfd.conf dest=/etc/nginx/sites-enabled/ctfd.conf state=link
+  file:
+    src: /etc/nginx/sites-available/ctfd.conf
+    dest: /etc/nginx/sites-enabled/ctfd.conf
+    state: link
   notify:
     - nginx
