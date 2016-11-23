@@ -40,7 +40,7 @@
 
 - name: Make CTFd deploy directory
   file:
-    path: {{ ctfd_deploy_directory }}
+    path: "{{ ctfd_deploy_directory }}"
     state: directory
     owner: ctfd
     group: ctfd
@@ -48,7 +48,7 @@
 
 - name: Make CTFd serve directory
   file:
-    path: {{ ctfd_serve_directory }}
+    path: "{{ ctfd_serve_directory }}"
     state: directory
     owner: ctfd
     group: ctfd
@@ -57,19 +57,19 @@
 - name: Install CTFd
   git:
     repo: https://github.com/isislab/CTFd.git
-    dest: {{ ctfd_deploy_directory }}
+    dest: "{{ ctfd_deploy_directory }}"
     force: yes
   become_user: ctfd
 
 - name: Install CTFd pip dependencies
   pip:
-    requirements: {{ctfd_deploy_directory}}/requirements.txt
+    requirements: "{{ctfd_deploy_directory}}/requirements.txt"
     umask: 0022
 
 - name: Configure CTFd
   template:
     src: config.py
-    dest: {{ ctfd_deploy_directory }}/CTFd/config.py
+    dest: "{{ ctfd_deploy_directory }}/CTFd/config.py"
     owner: ctfd
     group: ctfd
     mode: 0644
@@ -79,7 +79,7 @@
 - name: Configure CTFd uwsgi  
   template:
     src: ctfd.ini
-    dest: {{ ctfd_deploy_directory }}/ctfd.ini
+    dest: "{{ ctfd_deploy_directory }}/ctfd.ini"
     owner: ctfd
     group: ctfd
     mode: 0644
@@ -88,14 +88,14 @@
 
 - name: Add CTFd Postgres Database
   postgresql_db:
-    name: {{ ctfd_db }}
+    name: "{{ ctfd_db }}"
   become_user: postgres
 
 - name: Add CTFd Postgres User
   postgresql_user:
-    db: {{ ctfd_db }}
-    name: {{ ctfd_dbuser }}
-    password: {{ ctfd_dbpass }}
+    db: "{{ ctfd_db }}"
+    name: "{{ ctfd_dbuser }}"
+    password: "{{ ctfd_dbpass }}"
     priv: ALL
   become_user: postgres
 
