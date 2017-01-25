@@ -59,12 +59,13 @@
     repo: https://github.com/isislab/CTFd.git
     dest: "{{ ctfd_deploy_directory }}"
     force: yes
+    version: "{{ ctfd_commit_hash }}"
   become_user: ctfd
 
 - name: Install CTFd pip dependencies
   pip:
     requirements: "{{ctfd_deploy_directory}}/requirements.txt"
-    umask: 0022
+    umask: '0022'
 
 - name: Configure CTFd
   template:
@@ -72,7 +73,7 @@
     dest: "{{ ctfd_deploy_directory }}/CTFd/config.py"
     owner: ctfd
     group: ctfd
-    mode: 0644
+    mode: 0600
   notify:
     - ctfd
 

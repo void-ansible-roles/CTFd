@@ -11,4 +11,4 @@ ctfd_email: noreply@ctfd.io
 # CTFd setup information
 ctfd_deploy_directory: /opt/ctfd
 ctfd_serve_directory: /srv/ctfd 
-
+ctfd_commit_hash: 01cb189
