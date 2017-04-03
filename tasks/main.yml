@@ -161,6 +161,7 @@
     mode: 0644
   notify:
     - nginx
+  register: ctfd_nginx
 
 - name: Enable site
   file:
@@ -169,3 +170,7 @@
     state: link
   notify:
     - nginx
+
+- name: Reload nginx config
+  command: nginx -s reload
+  when: ctfd_nginx.changed
