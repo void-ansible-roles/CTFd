@@ -1,3 +1,4 @@
 #!/bin/sh
 
-exec su ctfd -c 'uwsgi --ini {{ ctfd_deploy_directory }}/ctfd.ini -s {{ ctfd_serve_directory }}/ctfd.socket'
+
+exec chpst -u ctfd:ctfd uwsgi --ini {{ ctfd_deploy_directory }}/ctfd.ini -s {{ ctfd_serve_directory }}/ctfd.socket

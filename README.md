@@ -27,12 +27,12 @@ Files Managed:
 Defaults Provided:
   * ctfd_db: ctfdb
   * ctfd_dbuser: ctfddbuser
-  * ctfd_site_url: .ctfd.io
+  * ctfd_site_url: _
   * ctfd_site_mount: /
   * ctfd_email: noreply@ctfd.io
   * ctfd_deploy_directory: /opt/ctfd
   * ctfd_serve_directory: /srv/ctfd
-  * ctfd_commit_hash: 01cb189
+  * ctfd_version: 1.0.1
 
 Variables Required:
   * ctfd_site_url: the url you will serve the site at
@@ -44,7 +44,7 @@ Optional Variables:
   * ctfd_email: the email address of the site administrator
   * ctfd_deploy_directory: the directory CTFd will be installed
   * ctfd_serve_directory: the directory CTFd will serve from
-  * ctfd_commit_hash: the last known good commit for CTFd
+  * ctfd_version: the last known good version for CTFd
 	
 Files Required:
   * None

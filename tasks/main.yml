@@ -7,6 +7,7 @@
       - libffi-devel
       - python-devel
       - python-pip
+      - python-virtualenv
       - uwsgi
       - uwsgi-python
     state: present
@@ -54,18 +55,35 @@
     group: ctfd
     mode: 0755
 
+- name: Download CTFd
+  unarchive:
+    src: "https://github.com/CTFd/CTFd/archive/{{ ctfd_version }}.tar.gz"
+    dest: "/tmp"
+    remote_src: True
+    creates: "{{ ctfd_deploy_directory }}/serve.py"
+  become_user: ctfd
+
 - name: Install CTFd
-  git:
-    repo: https://github.com/isislab/CTFd.git
-    dest: "{{ ctfd_deploy_directory }}"
-    force: yes
-    version: "{{ ctfd_commit_hash }}"
+  shell: "mv /tmp/CTFd-{{ ctfd_version }}/* {{ ctfd_deploy_directory }}"
+  args:
+    creates: "{{ ctfd_deploy_directory }}/serve.py"
   become_user: ctfd
 
 - name: Install CTFd pip dependencies
   pip:
-    requirements: "{{ctfd_deploy_directory}}/requirements.txt"
+    requirements: "{{ ctfd_deploy_directory }}/requirements.txt"
     umask: '0022'
+    virtualenv: "{{ ctfd_deploy_directory }}/venv"
+    virtualenv_python: "python2"
+
+- name: Install UWSGI pip dependencies
+  pip:
+    name:
+      - psycopg2
+    umask: '0022'
+    virtualenv: "{{ ctfd_deploy_directory }}/venv"
+    virtualenv_python: "python2"
+
 
 - name: Configure CTFd
   template:
@@ -77,7 +95,7 @@
   notify:
     - ctfd
 
-- name: Configure CTFd uwsgi  
+- name: Configure CTFd uwsgi
   template:
     src: ctfd.ini
     dest: "{{ ctfd_deploy_directory }}/ctfd.ini"
